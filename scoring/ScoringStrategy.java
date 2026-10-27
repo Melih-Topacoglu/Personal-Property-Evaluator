@@ -1,5 +1,11 @@
 package scoring;
 
-public class ScoringStrategy {
+import model.Property;
+import model.UserPreference;
 
+public interface ScoringStrategy {
+
+    double calculateScore(
+            Property property,
+            UserPreference preference);
 }
