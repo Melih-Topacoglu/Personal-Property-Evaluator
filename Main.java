@@ -1,76 +1,85 @@
-import java.util.Optional;
+import java.util.Map;
 
 import model.Property;
-import repository.PropertyRepository;
-import service.PropertyService;
+import model.PropertyScore;
+import model.UserPreference;
+
+import scoring.ScoringStrategy;
+import scoring.PriceScoringStrategy;
+import scoring.CommuteScore;
+import scoring.SizeScore;
+import scoring.TransportScore;
+import scoring.QuietAreaScoringStrategy;
+
+import service.ScoringService;
+import service.PropertyEvaluationService;
 
 public class Main {
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
 
-        // Dependency Injection
-        PropertyRepository repository = new PropertyRepository();
-        PropertyService service = new PropertyService(repository);
+                // 1. Configure scoring strategies and weights
+                Map<ScoringStrategy, Double> weights = Map.of(
+                                new PriceScoringStrategy(), 0.25,
+                                new CommuteScore(), 0.30,
+                                new TransportScore(), 0.20,
+                                new SizeScore(), 0.15,
+                                new QuietAreaScoringStrategy(), 0.10);
 
-        // Create properties
-        Property p1 = new Property(
-                1, "Kadıköy", 4_500_000,
-                120, 3, 500, 35, true);
+                // 2. Initialize services
+                ScoringService scoringService = new ScoringService(weights);
 
-        Property p2 = new Property(
-                2, "Maltepe", 3_800_000,
-                100, 2, 300, 45, true);
+                PropertyEvaluationService evaluationService = new PropertyEvaluationService(scoringService);
 
-        Property p3 = new Property(
-                3, "Üsküdar", 5_200_000,
-                140, 4, 800, 25, false);
+                // 3. Create a property
+                Property property = new Property(
+                                1,
+                                "Kadıköy",
+                                4_500_000,
+                                120,
+                                3,
+                                500,
+                                35,
+                                true);
 
-        // 1. Add properties
-        service.addProperty(p1);
-        service.addProperty(p2);
-        service.addProperty(p3);
+                // 4. Create user preferences
+                UserPreference preference = new UserPreference(
+                                5_000_000,
+                                40,
+                                100,
+                                3,
+                                true,
+                                true);
 
-        // 2. List all properties
-        System.out.println("\n--- ALL PROPERTIES ---");
+                // 5. Evaluate the property
+                PropertyScore result = evaluationService.evaluateProperty(
+                                property,
+                                preference);
 
-        service.getAllProperties()
-                .forEach(System.out::println);
+                // 6. Display results
+                System.out.println("========== PROPERTY EVALUATION ==========");
 
-        // 3. Find property by ID
-        System.out.println("\n--- FIND PROPERTY BY ID: 2 ---");
+                System.out.println("\n--- PROPERTY INFORMATION ---");
+                System.out.println(property);
 
-        Optional<Property> result = service.getPropertyById(2);
+                System.out.println("\n--- USER PREFERENCES ---");
+                System.out.println(preference);
 
-        result.ifPresentOrElse(
-                System.out::println,
-                () -> System.out.println("Property not found"));
+                System.out.println("\n--- EVALUATION RESULT ---");
+                System.out.println(result);
 
-        // 4. Delete property
-        System.out.println("\n--- DELETE PROPERTY BY ID: 1 ---");
+                // 7. Verify expected total score
+                double expectedScore = 90.0625;
+                double actualScore = result.getScore();
 
-        boolean deleted = service.deleteById(1);
-
-        System.out.println("Deleted: " + deleted);
-
-        // 5. List remaining properties
-        System.out.println("\n--- REMAINING PROPERTIES ---");
-
-        service.getAllProperties()
-                .forEach(System.out::println);
-
-        // 6. Try adding a duplicate ID
-        System.out.println("\n--- DUPLICATE ID TEST ---");
-
-        Property duplicate = new Property(
-                2, "Ataşehir", 4_100_000,
-                110, 3, 450, 30, true);
-
-        service.addProperty(duplicate);
-
-        // 7. Verify final property count
-        System.out.println("\n--- FINAL PROPERTY COUNT ---");
-
-        System.out.println(
-                "Total properties: " + service.getAllProperties().size());
-    }
+                if (Math.abs(expectedScore - actualScore) < 0.000001) {
+                        System.out.println("\nTEST PASSED");
+                } else {
+                        System.out.println("\nTEST FAILED");
+                        System.out.printf(
+                                        "Expected: %.4f | Actual: %.4f%n",
+                                        expectedScore,
+                                        actualScore);
+                }
+        }
 }
