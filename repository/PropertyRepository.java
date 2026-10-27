@@ -12,7 +12,7 @@ public class PropertyRepository {
     public void save(Property property) {
         if (properties.stream()
                 .anyMatch(p -> p.getId() == property.getId())) {
-            System.out.println("There is already a property with the id" + property.getId());
+            System.out.println("There is already a property with the id " + property.getId());
             return;
         }
         properties.add(property);
