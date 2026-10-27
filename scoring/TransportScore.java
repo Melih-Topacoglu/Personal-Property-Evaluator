@@ -22,4 +22,9 @@ public class TransportScore implements ScoringStrategy {
         }
         return 0.0;
     }
+
+    @Override
+    public String getCriterionName() {
+        return "TRANSPORTATION";
+    }
 }

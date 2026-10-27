@@ -25,4 +25,8 @@ public class CommuteScore implements ScoringStrategy {
         }
         return 0.0;
     }
+    @Override
+    public String getCriterionName() {
+        return "COMMUTE";
+    }
 }

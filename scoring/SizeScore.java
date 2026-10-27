@@ -24,4 +24,9 @@ public class SizeScore implements ScoringStrategy {
         }
         return 100.0;
     }
+
+    @Override
+    public String getCriterionName() {
+        return "SIZE";
+    }
 }

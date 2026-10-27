@@ -2,9 +2,12 @@ package service;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 import model.Property;
 import model.UserPreference;
+import model.ScoreBreakdown;
 import scoring.ScoringStrategy;
 
 public class ScoringService {
@@ -36,33 +39,37 @@ public class ScoringService {
         this.strategies = Map.copyOf(strategies);
     }
 
-    public double calculateTotalScore(
-            Property property,
-            UserPreference preference) {
+    public double calculateTotalScore(Property property, UserPreference preference) {
+
+        return calculateScoreBreakdown(property, preference)
+                .stream()
+                .mapToDouble(ScoreBreakdown::getWeightedScore)
+                .sum();
+        }
+
+    public List<ScoreBreakdown> calculateScoreBreakdown(Property property, UserPreference preference) {
 
         Objects.requireNonNull(property, "Property cannot be null");
         Objects.requireNonNull(preference, "UserPreference cannot be null");
 
-        double totalScore = 0.0;
+        List<ScoreBreakdown> breakdowns = new ArrayList<>();
 
         for (Map.Entry<ScoringStrategy, Double> entry : strategies.entrySet()) {
 
             ScoringStrategy strategy = entry.getKey();
             double weight = entry.getValue();
-            double strategyScore = strategy.calculateScore(property, preference);
 
-            if (!Double.isFinite(strategyScore)
-                    || strategyScore < 0.0
-                    || strategyScore > 100.0) {
+        // TODO: Get criterion name
+            String criterionName = strategy.getCriterionName();
+        // TODO: Calculate raw score
+            double rawScore = strategy.calculateScore(property,preference);
+        // TODO: Create ScoreBreakdown object
+            ScoreBreakdown scoreBreakdown = new ScoreBreakdown(criterionName,rawScore,weight);
+        // TODO: Add ScoreBreakdown to the list
 
-                throw new IllegalStateException(
-                        "Strategy score must be between 0 and 100");
-            }
-
-            strategyScore *= weight;
-            totalScore += strategyScore;
+            breakdowns.add(scoreBreakdown);
         }
 
-        return totalScore;
+        return List.copyOf(breakdowns);
     }
 }

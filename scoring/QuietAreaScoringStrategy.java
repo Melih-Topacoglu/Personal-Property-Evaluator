@@ -16,4 +16,9 @@ public class QuietAreaScoringStrategy implements ScoringStrategy {
 
         return property.isQuietArea() ? 100.0 : 0.0;
     }
+
+    @Override
+    public String getCriterionName() {
+        return "QUIET_AREA";
+    }
 }

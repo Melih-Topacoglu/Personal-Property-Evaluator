@@ -8,4 +8,6 @@ public interface ScoringStrategy {
     double calculateScore(
             Property property,
             UserPreference preference);
+            
+    String getCriterionName();        
 }
