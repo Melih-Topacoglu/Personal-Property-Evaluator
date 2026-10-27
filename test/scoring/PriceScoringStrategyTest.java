@@ -1,4 +1,4 @@
-package scoring;
+package test.scoring;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
