@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import model.Property;
 import model.UserPreference;
+import scoring.PriceScoringStrategy;
 
 class PriceScoringStrategyTest {
 

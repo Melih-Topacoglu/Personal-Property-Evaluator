@@ -12,8 +12,7 @@ public class PropertyRepository {
     public void save(Property property) {
         if (properties.stream()
                 .anyMatch(p -> p.getId() == property.getId())) {
-            System.out.println("There is already a property with the id " + property.getId());
-            return;
+            throw new IllegalArgumentException("Property with ID " + property.getId() + " already exists.");
         }
         properties.add(property);
     }
@@ -31,11 +30,12 @@ public class PropertyRepository {
 
     public List<Property> findByDistrict(String district) {
         return properties.stream()
-                .filter(p -> p.getDistrict() == district)
+                .filter(p -> p.getDistrict().equalsIgnoreCase(district))
                 .toList();
     }
 
     public boolean deleteById(int id) {
         return properties.removeIf(p -> p.getId() == id);
+        
     }
 }

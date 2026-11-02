@@ -59,14 +59,11 @@ public class ScoringService {
             ScoringStrategy strategy = entry.getKey();
             double weight = entry.getValue();
 
-        // TODO: Get criterion name
             String criterionName = strategy.getCriterionName();
-        // TODO: Calculate raw score
-            double rawScore = strategy.calculateScore(property,preference);
-        // TODO: Create ScoreBreakdown object
-            ScoreBreakdown scoreBreakdown = new ScoreBreakdown(criterionName,rawScore,weight);
-        // TODO: Add ScoreBreakdown to the list
 
+            double rawScore = strategy.calculateScore(property,preference);
+
+            ScoreBreakdown scoreBreakdown = new ScoreBreakdown(criterionName,rawScore,weight);
             breakdowns.add(scoreBreakdown);
         }
 

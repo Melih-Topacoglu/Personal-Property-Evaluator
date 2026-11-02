@@ -1,7 +1,9 @@
 package service;
 
 import java.util.Objects;
+import java.util.List;
 
+import model.ScoreBreakdown;
 import model.Property;
 import model.PropertyScore;
 import model.UserPreference;
@@ -15,12 +17,17 @@ public class PropertyEvaluationService {
                 scoringService, "ScoringService cannot be null");
     }
 
-    public PropertyScore evaluateProperty(
-            Property property,
-            UserPreference preference) {
+    public PropertyScore evaluateProperty(Property property,UserPreference preference) {
 
-        double totalScore = scoringService.calculateTotalScore(property, preference);
-        PropertyScore propertyScore = new PropertyScore(property, totalScore);
-        return propertyScore;
+        Objects.requireNonNull(property, "Property cannot be null");
+        Objects.requireNonNull(preference, "UserPreference cannot be null");
+
+        List<ScoreBreakdown> breakdowns = scoringService.calculateScoreBreakdown(property, preference);
+
+        double totalScore = breakdowns.stream()
+            .mapToDouble(ScoreBreakdown::getWeightedScore)
+            .sum();
+
+        return new PropertyScore(property, totalScore, breakdowns);
     }
 }
